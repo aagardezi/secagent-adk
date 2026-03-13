@@ -6,6 +6,9 @@ from google.adk.tools.function_tool import FunctionTool
 from google.adk.tools import google_search # Keeping google_search as it's not a finhub tool
 import vertexai
 from .config import config
+from google.adk.models import google_llm
+
+from .helpercode import get_project_id
 
 # Import only the new SEC tools
 from .tools.sec import full_text_search, get_recent_filings, extract_filing_section
@@ -18,15 +21,25 @@ def get_current_date() -> str:
 get_current_date_tool = FunctionTool(get_current_date)
 
 
-vertexai.init(
-    project=os.environ['GOOGLE_CLOUD_PROJECT'],
-    location="global",
+# vertexai.init(
+#     project=os.environ['GOOGLE_CLOUD_PROJECT'],
+#     location="global",
+# )
+
+from google import genai
+
+api_client = genai.Client(
+    vertexai=True,
+    project=get_project_id(),
+    location="global"
 )
+model = google_llm.Gemini(model=config.gemini_model)
+model.api_client= api_client 
 
 search_agent = Agent(
     name="search_agent",
     # model="gemini-2.5-flash",
-    model=config.gemini_model,
+    model=model,
     description=(
         "Agent to search about anything"
     ),
@@ -36,7 +49,7 @@ search_agent = Agent(
 
 sec_search_agent = Agent(
     name="sec_search_agent",
-    model=config.gemini_model,
+    model=model,
     description="Agent for searching across all recent SEC filings for specific topics or keywords.",
     instruction=(
         "You are an SEC research assistant. Use the `full_text_search` tool to find SEC filings "
@@ -51,7 +64,7 @@ sec_search_agent = Agent(
 
 sec_filing_agent = Agent(
     name="sec_filing_agent",
-    model=config.gemini_model,
+    model=model,
     description="Agent for finding and extracting specific sections from a company's SEC filings.",
     instruction=(
         "You are an SEC filing extraction specialist. When asked about a specific company's financials or risks: "
@@ -65,7 +78,7 @@ sec_filing_agent = Agent(
 
 sec_insider_agent = Agent(
     name="sec_insider_agent",
-    model=config.gemini_model,
+    model=model,
     description="Agent for tracking insider trading transactions (Forms 3, 4, 5).",
     instruction=(
         "You are an insider trading analyst. Use the `get_insider_transactions` tool to find transactions "
@@ -81,7 +94,7 @@ sec_insider_agent = Agent(
 
 sec_report_agent = Agent(
     name="sec_report_agent",
-    model=config.gemini_model,
+    model=model,
     description="Agent that synthesizes raw SEC filing text into comprehensive financial reports.",
     instruction=(
         "You are a highly skilled financial analyst. Your job is to read raw SEC extracts and search results "
@@ -110,7 +123,7 @@ sec_master_agent = SequentialAgent(
 # The instruction will need to be updated to reflect what data it now receives.
 report_creation_agent = Agent(
     name="report_creation_agent",
-    model=config.gemini_model,
+    model=model,
     description=(
         "You are an agent helping an investment analyst create a report on an asset or stock"
     ),
@@ -166,7 +179,7 @@ sequential_agent = SequentialAgent(
 # Its instruction needs to be simplified to reflect the new capabilities.
 root_agent = Agent(
     name="investment_agent",
-    model=config.gemini_model,
+    model=model,
     description=(
         "You are an agent helping an investment analyst at an asset manager"
     ),
