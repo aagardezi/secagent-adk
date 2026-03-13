@@ -63,3 +63,7 @@ adk deploy --project YOUR_PROJECT_ID --agent edgar_agent.agent:root_agent --name
 ```
 
 This will package your agent logic, tools, and configurations, and deploy them to Vertex AI AgentEngine, giving you a scalable, managed endpoint to interact with your SEC Agent.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
