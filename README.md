@@ -5,17 +5,26 @@ This project contains a financial analysis agent built using the **Google Agent 
 ## Features & Subagents
 - **sec_search_agent**: Performs broad, full-text searches across the SEC database for specific topics or keywords.
 - **sec_filing_agent**: Locates recent filings for targeted tickers and extracts specific sections (e.g., "Risk Factors" or "Management's Discussion") for deep-dive analysis.
-- **sec_report_agent**: Synthesizes the retrieved filing text into a comprehensive financial analysis report.
+- **sec_insider_agent**: Retrieves and analyzes insider trading transactions (Forms 3, 4, 5) for specific companies.
+- **sec_report_agent**: Synthesizes the retrieved filing text and insider trading data into a comprehensive financial analysis report.
 
 ## Who Benefits from This Agent?
 - **Financial Analysts & Researchers**: Automates the tedious process of digging through the EDGAR database, instantly surfacing relevant sections like 10-K Risk Factors or MD&A without manual downloading and parsing.
 - **Investment Firms**: Allows rapid scanning of the market for macro-trends by using full-text search across thousands of recent 8-Ks and 10-Qs (e.g., tracking the adoption of "artificial intelligence" in forward-looking statements).
 - **Compliance & Risk Teams**: Monitors changes in competitor disclosures or industry-wide risk factors efficiently.
 
+## Recent Changes
+
+### Insider Trading Agent Integration
+A new specialized agent, `sec_insider_agent`, has been added to retrieve and analyze insider trading activity (via SEC Forms 3, 4, and 5). The `sec_report_agent` has been updated to incorporate these insider trading insights into the final investment report.
+
+### Gemini 3.1 Pro Configuration
+The configuration has been updated to use `gemini-3.1-pro-preview` as the default model. When running the full agent pipeline, it is recommended to ensure the global endpoint is accessible (see Setup Instructions).
+
 ## Prerequisites
 
 1. **Google Cloud Project**: You need an active Google Cloud Project with Vertex AI and Secret Manager APIs enabled.
-2. **Python Environment**: The agent is configured to run with `python3.14`.
+2. **Python Environment**: The agent is configured to run with `python3.12`.
 3. **sec-api Account**: You need an API key from [sec-api.io](https://sec-api.io/).
 
 ## Setup Instructions
@@ -36,7 +45,7 @@ gcloud config set project YOUR_PROJECT_ID
 ```
 
 ### 3. Install Packages
-Ensure your local Python 3.14 environment has the required libraries:
+Ensure your local Python 3.12 environment has the required libraries:
 
 ```bash
 pip install google-adk sec-api google-cloud-secret-manager
@@ -47,6 +56,7 @@ pip install google-adk sec-api google-cloud-secret-manager
 Once the agent is running, try the following prompts to see its capabilities:
 
 - *"Analyze the latest 10-K risk factors for TSLA and identify any new risks related to supply chain."*
+- *"Analyze insider trading for TSLA over the past year."*
 - *"Find recent 8-K filings for AAPL regarding leadership changes."*
 - *"Summarize the 'Management's Discussion and Analysis' section of MSFT's latest 10-Q."*
 - *"Search the SEC full text database for mentions of 'inflation expectations' by retail companies in the last 30 days."*

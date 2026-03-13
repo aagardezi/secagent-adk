@@ -9,6 +9,7 @@ from .config import config
 
 # Import only the new SEC tools
 from .tools.sec import full_text_search, get_recent_filings, extract_filing_section
+from .tools.insider_trading import get_insider_transactions
 
 def get_current_date() -> str:
     """Returns the current date in YYYY-MM-DD format."""
@@ -62,6 +63,22 @@ sec_filing_agent = Agent(
     output_key="sec_filing_extracts"
 )
 
+sec_insider_agent = Agent(
+    name="sec_insider_agent",
+    model=config.gemini_model,
+    description="Agent for tracking insider trading transactions (Forms 3, 4, 5).",
+    instruction=(
+        "You are an insider trading analyst. Use the `get_insider_transactions` tool to find transactions "
+        "for a specific company. "
+        "ALWAYS use the `get_current_date` tool first to determine the date range if the user doesn't specify one, "
+        "defaulting to searching the past year. "
+        "Summarize the findings, highlighting significant buys or sells. "
+        "Return the summary so the report agent can analyze it."
+    ),
+    tools=[get_current_date_tool, get_insider_transactions],
+    output_key="sec_insider_results"
+)
+
 sec_report_agent = Agent(
     name="sec_report_agent",
     model=config.gemini_model,
@@ -71,10 +88,12 @@ sec_report_agent = Agent(
         "and synthesize them into a professional, structured investment report. "
         "Make sure to highlight key risk factors, management discussion points, and broad market trends "
         "based strictly on the provided context. "
+        "Analyze insider trading activity as well to determine management sentiment if available. "
         "Do NOT invent information. If data is missing, state what is missing.\n"
         "Input Context:\n"
         "Search Results: {sec_search_results}\n"
         "Filing Extracts: {sec_filing_extracts}\n"
+        "Insider Trading Results: {sec_insider_results}\n"
     ),
     output_key="sec_final_report"
 )
@@ -83,7 +102,7 @@ sec_report_agent = Agent(
 sec_master_agent = SequentialAgent(
     name="sec_master_agent",
     description="Master agent that coordinates SEC search, extraction, and report generation.",
-    sub_agents=[sec_search_agent, sec_filing_agent, sec_report_agent]
+    sub_agents=[sec_search_agent, sec_filing_agent, sec_insider_agent, sec_report_agent]
 )
 
 # The report_creation_agent needs to be updated to reflect the new SEC agents and removed finhub agents.
@@ -105,7 +124,7 @@ report_creation_agent = Agent(
      {sec_final_report}
 
         **Comprehensive Report:** Your report should be comprehensive, detailed and contain the following sections:
-                            *   **SEC Analysis:** Provide a detailed overview of the SEC search results and filing extracts, highlighting key risk factors, management discussion points, and broad market trends.
+                             *   **SEC Analysis:** Provide a detailed overview of the SEC search results, filing extracts, and insider trading activity, highlighting key risk factors, management discussion points, broad market trends, and management sentiment.
 
                         **4. Data Handling and Error Management:**
 
@@ -167,8 +186,7 @@ root_agent = Agent(
                         Use the data_retrieval_agent to collect data for the following sections
 
                         *   **Comprehensive Report:** Your report should be comprehensive, detailed and contain the following sections:
-                            *   **SEC Analysis:** Provide a detailed overview of the SEC search results and filing extracts, highlighting key risk factors, management discussion points, and broad market trends.
-
+                             *   **SEC Analysis:** Provide a detailed overview of the SEC search results, filing extracts, and insider trading activity, highlighting key risk factors, management discussion points, broad market trends, and management sentiment.
 
                         **3. Data Handling and Error Management:**
 
