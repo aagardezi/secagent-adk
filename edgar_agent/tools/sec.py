@@ -5,7 +5,7 @@ from . import helpercode
 PROJECT_ID = helpercode.get_project_id()
 SEC_API_KEY = helpercode.access_secret_version(PROJECT_ID, "SECAPIKey")
 
-def _full_text_search(query: str, start_date: str, end_date: str) -> str:
+def full_text_search(query: str, start_date: str, end_date: str) -> str:
     """
     Search the full text of SEC filings (like 10-K, 10-Q, 8-K) for a specific query string within a date range.
     
@@ -45,7 +45,7 @@ def _full_text_search(query: str, start_date: str, end_date: str) -> str:
     except Exception as e:
         return f"Error executing full text search: {e}"
 
-def _get_recent_filings(ticker: str, form_type: str = "10-K") -> str:
+def get_recent_filings(ticker: str, form_type: str = "10-K") -> str:
     """
     Retrieve metadata for the most recent SEC filing of a specific type for a given company.
     
@@ -85,7 +85,7 @@ def _get_recent_filings(ticker: str, form_type: str = "10-K") -> str:
     except Exception as e:
         return f"Error querying filings for {ticker}: {e}"
 
-def _extract_filing_section(filing_url: str, section: str = "1A") -> str:
+def extract_filing_section(filing_url: str, section: str = "1A") -> str:
     """
     Extract a specific section from an SEC filing. This is especially useful for 10-K filings.
     
@@ -109,6 +109,6 @@ def _extract_filing_section(filing_url: str, section: str = "1A") -> str:
     except Exception as e:
         return f"Error extracting section {section} from URL {filing_url}: {e}"
 
-full_text_search = FunctionTool(_full_text_search)
-get_recent_filings = FunctionTool(_get_recent_filings)
-extract_filing_section = FunctionTool(_extract_filing_section)
+full_text_search = FunctionTool(full_text_search)
+get_recent_filings = FunctionTool(get_recent_filings)
+extract_filing_section = FunctionTool(extract_filing_section)
