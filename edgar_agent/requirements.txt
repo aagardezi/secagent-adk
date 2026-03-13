@@ -1,0 +1,7 @@
+google-adk
+finnhub-python
+requests
+beautifulsoup4
+google-cloud-secret-manager
+google-auth
+sec-api
