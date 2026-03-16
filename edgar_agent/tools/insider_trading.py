@@ -1,4 +1,5 @@
 import math
+import os
 import sec_api
 from google.adk.tools.function_tool import FunctionTool
 from . import helpercode
@@ -64,6 +65,9 @@ def get_insider_transactions(ticker: str, start_date: str = None, end_date: str 
     Returns:
         A formatted string summarizing the insider transactions.
     """
+    if os.environ.get("MOCK_SEC_API") == "true":
+        return f"Found 2 insider transactions (Mock Mode):\n- 2026-02-01: Elon Musk Disposed 1000 shares of Common Stock at $200 (Total: $200000)\n- 2026-03-01: Drew Baglino Acquired 500 shares of Common Stock at $190 (Total: $95000)\n"
+
     insider_api = sec_api.InsiderTradingApi(api_key=SEC_API_KEY)
     
     query = f"issuer.tradingSymbol:{ticker}"

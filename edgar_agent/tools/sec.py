@@ -1,3 +1,4 @@
+import os
 import sec_api
 from google.adk.tools.function_tool import FunctionTool
 from . import helpercode
@@ -17,6 +18,9 @@ def full_text_search(query: str, start_date: str, end_date: str) -> str:
     Returns:
         A formatted string summarizing the matching filings.
     """
+    if os.environ.get("MOCK_SEC_API") == "true":
+        return f"Found 2 filings (Mock Mode):\n- Tesla, Inc. (TSLA) filed a 10-K on 2026-01-01\n- Tesla, Inc. (TSLA) filed a 10-Q on 2026-04-01\n"
+
     search_api = sec_api.FullTextSearchApi(api_key=SEC_API_KEY)
     
     search_query = {
@@ -56,6 +60,9 @@ def get_recent_filings(ticker: str, form_type: str = "10-K") -> str:
     Returns:
         A string containing the filing URL and exact document URL if found.
     """
+    if os.environ.get("MOCK_SEC_API") == "true":
+        return f"Found recent {form_type} for {ticker} filed on 2026-01-01.\nURL: https://www.sec.gov/Archives/edgar/data/1318605/000162828024002390/tsla-20231231.htm"
+
     query_api = sec_api.QueryApi(api_key=SEC_API_KEY)
     
     query = {
@@ -96,6 +103,29 @@ def extract_filing_section(filing_url: str, section: str = "1A") -> str:
     Returns:
         A string containing the extracted text.
     """
+    if os.environ.get("MOCK_SEC_API") == "true":
+        if section == "1A":
+            return """--- START OF SECTION 1A ---
+Item 1A. Risk Factors
+
+We face many risks. Here are the big ones:
+
+1. Key Personnel: We depend on Elon Musk. If he leaves or is distracted, we are in trouble.
+2. Competition: The EV market is crowded. Legacy automakers and new players are aggressive.
+3. Supply Chain: We need batteries and chips. Disruption hurts production.
+
+...
+--- END OF SECTION 1A ---"""
+        elif section == "7":
+            return """--- START OF SECTION 7 ---
+Item 7. Management Discussion
+
+We are doing well but face risks.
+...
+--- END OF SECTION 7 ---"""
+        else:
+            return f"--- START OF SECTION {section} ---\nMock content for section {section}\n--- END OF SECTION {section} ---"
+
     extractor_api = sec_api.ExtractorApi(api_key=SEC_API_KEY)
     
     try:

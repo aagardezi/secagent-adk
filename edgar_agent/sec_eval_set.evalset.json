@@ -1,0 +1,19 @@
+{
+  "eval_set_id": "sec_eval_set",
+  "name": "sec_eval_set",
+  "eval_cases": [
+    {
+      "eval_id": "61da266d",
+      "conversation_scenario": {
+        "starting_prompt": "Analyze the latest 10-K risk factors for TSLA",
+        "conversation_plan": "First, use get_recent_filings to find the URL for the most recent 10-K. Then use extract_filing_section to pull exactly the text needed (e.g., '1A' for Risk Factors). Return the raw extracted text so the report agent can analyze it."
+      },
+      "session_input": {
+        "app_name": "edgar_agent",
+        "user_id": "eval_user"
+      },
+      "creation_timestamp": 1773658073.834007
+    }
+  ],
+  "creation_timestamp": 1773658063.627021
+}
