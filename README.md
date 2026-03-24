@@ -8,6 +8,55 @@ This project contains a financial analysis agent built using the **Google Agent 
 - **sec_insider_agent**: Retrieves and analyzes insider trading transactions (Forms 3, 4, 5) for specific companies.
 - **sec_report_agent**: Synthesizes the retrieved filing text and insider trading data into a comprehensive financial analysis report.
 
+## Agent Architecture
+
+```mermaid
+graph TD
+    Root([investment_agent])
+    
+    subgraph Execution Pipeline
+        SeqAgent[sequential_agent]
+        DataRetrieval[data_retrieval_agent]
+        ReportCreation[report_creation_agent]
+        
+        subgraph SEC Analysis Phase
+            SECMaster[sec_master_agent]
+            SECSearch[sec_search_agent]
+            SECFiling[sec_filing_agent]
+            SECInsider[sec_insider_agent]
+            SECReport[sec_report_agent]
+        end
+    end
+
+    %% Tools
+    ToolsCurrentDate[get_current_date]
+    ToolsFullTextSearch[full_text_search]
+    ToolsRecentFilings[get_recent_filings]
+    ToolsExtractFiling[extract_filing_section]
+    ToolsInsider[get_insider_transactions]
+
+    %% Hierarchy
+    Root --> SeqAgent
+    SeqAgent --> DataRetrieval
+    SeqAgent --> ReportCreation
+    
+    DataRetrieval -.-> SECMaster
+    
+    SECMaster --> SECSearch
+    SECMaster --> SECFiling
+    SECMaster --> SECInsider
+    SECMaster --> SECReport
+
+    %% Assignments
+    Root -.-> ToolsCurrentDate
+    SECSearch -.-> ToolsCurrentDate
+    SECSearch -.-> ToolsFullTextSearch
+    SECFiling -.-> ToolsRecentFilings
+    SECFiling -.-> ToolsExtractFiling
+    SECInsider -.-> ToolsCurrentDate
+    SECInsider -.-> ToolsInsider
+```
+
 ## Who Benefits from This Agent?
 - **Financial Analysts & Researchers**: Automates the tedious process of digging through the EDGAR database, instantly surfacing relevant sections like 10-K Risk Factors or MD&A without manual downloading and parsing.
 - **Investment Firms**: Allows rapid scanning of the market for macro-trends by using full-text search across thousands of recent 8-Ks and 10-Qs (e.g., tracking the adoption of "artificial intelligence" in forward-looking statements).
